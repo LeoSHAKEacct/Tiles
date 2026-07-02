@@ -1,2 +1,1303 @@
-cd ~/Tiles
-pbpaste > index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Tile & Stone Inc. — Hudson Valley</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & tokens ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #1a1714;
+      --charcoal:   #2c2925;
+      --stone:      #3d3830;
+      --travertine: #c8b89a;
+      --beige:      #ede6d9;
+      --marble:     #f5f2ed;
+      --copper:     #b87333;
+      --bronze:     #8b5e3c;
+      --white:      #fdfcfa;
+
+      --font-serif: 'Fraunces', Georgia, serif;
+      --font-sans:  'Inter', system-ui, sans-serif;
+      --font-mono:  'JetBrains Mono', monospace;
+
+      --nav-h: 68px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--white);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Nav ────────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: rgba(26, 23, 20, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(184,115,51,0.18);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-logomark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 3px;
+    }
+
+    .nav-logomark span {
+      background: var(--travertine);
+      border-radius: 2px;
+      transition: background 0.3s;
+    }
+    .nav-logomark span:nth-child(2) { background: var(--copper); }
+    .nav-logomark span:nth-child(3) { background: var(--copper); opacity: 0.6; }
+    .nav-logomark span:nth-child(4) { background: var(--travertine); opacity: 0.7; }
+
+    .nav-logo:hover .nav-logomark span { background: var(--copper); opacity: 1; }
+
+    .nav-wordmark {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--marble);
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+    }
+    .nav-wordmark small {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      font-weight: 400;
+      color: var(--travertine);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--travertine);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: var(--copper);
+      padding: 10px 22px;
+      border-radius: 3px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover {
+      background: var(--travertine);
+      transform: translateY(-1px);
+    }
+
+    /* ── Hero ───────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      background: var(--ink);
+      padding-top: var(--nav-h);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-headline {
+      padding: 56px 40px 32px;
+      max-width: 640px;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 16px;
+    }
+
+    .hero-headline h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--marble);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-headline h1 em {
+      font-style: normal;
+      color: var(--travertine);
+    }
+
+    /* Interactive tile grid */
+    .hero-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 30% 1fr;
+      min-height: 520px;
+    }
+
+    .tile-col {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      gap: 3px;
+      padding: 3px;
+    }
+
+    .tile-cell {
+      position: relative;
+      aspect-ratio: 1;
+      overflow: hidden;
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .tile-cell::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(26,23,20,0.35);
+      transition: opacity 0.25s;
+    }
+
+    .tile-cell:hover::after { opacity: 0; }
+
+    .tile-cell.flash {
+      animation: brightness-flash 0.35s ease-out;
+    }
+
+    @keyframes brightness-flash {
+      0%   { filter: brightness(2.5); }
+      100% { filter: brightness(1); }
+    }
+
+    /* Tooltip */
+    .tile-tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: rgba(26,23,20,0.92);
+      color: var(--travertine);
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      padding: 5px 9px;
+      border-radius: 3px;
+      border: 1px solid rgba(184,115,51,0.3);
+      white-space: nowrap;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .tile-tooltip.visible { opacity: 1; }
+
+    /* Center hero image */
+    .hero-center {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .hero-center img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .hero-center:hover img { transform: scale(1.03); }
+
+    .hero-center-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 28px;
+      background: linear-gradient(to top, rgba(26,23,20,0.7) 0%, transparent 55%);
+    }
+
+    .hero-center-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--travertine);
+      margin-bottom: 8px;
+    }
+
+    .hero-center-cta {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      color: var(--white);
+      border: 1px solid rgba(245,242,237,0.5);
+      padding: 9px 22px;
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .hero-center-cta:hover {
+      background: var(--copper);
+      border-color: var(--copper);
+    }
+
+    /* ── Stats bar ──────────────────────────────────────────────── */
+    #stats {
+      background: var(--charcoal);
+      border-top: 1px solid rgba(184,115,51,0.25);
+      border-bottom: 1px solid rgba(184,115,51,0.25);
+      display: flex;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .stat {
+      flex: 1;
+      max-width: 240px;
+      padding: 28px 24px;
+      text-align: center;
+      border-right: 1px solid rgba(184,115,51,0.15);
+    }
+    .stat:last-child { border-right: none; }
+
+    .stat-number {
+      font-family: var(--font-serif);
+      font-size: 2.1rem;
+      font-weight: 300;
+      color: var(--travertine);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #7a6f65;
+    }
+
+    /* ── Section shared ─────────────────────────────────────────── */
+    .section-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 14px;
+    }
+
+    .section-header h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink);
+      line-height: 1.15;
+    }
+
+    .section-header p {
+      margin-top: 14px;
+      font-size: 1rem;
+      color: #5a524a;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+
+    /* ── Services ───────────────────────────────────────────────── */
+    #services {
+      padding: 96px 40px;
+      background: var(--marble);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .service-card {
+      background: var(--white);
+      padding: 40px 32px;
+      border: 1px solid rgba(200,184,154,0.3);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 3px;
+      width: 0;
+      background: var(--copper);
+      transition: width 0.35s ease;
+    }
+
+    .service-card:hover::before { width: 100%; }
+    .service-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(26,23,20,0.1);
+      border-color: rgba(184,115,51,0.3);
+    }
+
+    .service-icon {
+      font-size: 1.8rem;
+      margin-bottom: 18px;
+      color: var(--copper);
+    }
+
+    .service-card h3 {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .service-card p {
+      font-size: 0.9rem;
+      color: #6b6059;
+      line-height: 1.65;
+    }
+
+    /* ── Materials ──────────────────────────────────────────────── */
+    #materials {
+      padding: 96px 40px;
+      background: var(--ink);
+    }
+
+    #materials .section-header h2 { color: var(--marble); }
+    #materials .section-header p { color: var(--travertine); opacity: 0.8; }
+
+    .materials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .material-card {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .material-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .material-card:hover img { transform: scale(1.07); }
+
+    .material-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(26,23,20,0.85) 0%, rgba(26,23,20,0.1) 50%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+      transition: background 0.3s;
+    }
+
+    .material-card:hover .material-overlay {
+      background: linear-gradient(to top, rgba(26,23,20,0.9) 0%, rgba(26,23,20,0.3) 100%);
+    }
+
+    .material-tag {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 5px;
+    }
+
+    .material-name {
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .material-zoom {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 32px; height: 32px;
+      background: rgba(26,23,20,0.7);
+      border: 1px solid rgba(245,242,237,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      color: var(--white);
+      font-size: 0.85rem;
+    }
+
+    .material-card:hover .material-zoom { opacity: 1; }
+
+    /* ── Gallery ────────────────────────────────────────────────── */
+    #gallery {
+      padding: 96px 40px;
+      background: var(--beige);
+    }
+
+    .masonry {
+      columns: 4;
+      column-gap: 12px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 12px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .masonry-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .masonry-item:hover img { transform: scale(1.05); }
+
+    .masonry-item-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(26,23,20,0);
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .masonry-item:hover .masonry-item-overlay {
+      background: rgba(26,23,20,0.4);
+    }
+
+    .masonry-zoom {
+      color: var(--white);
+      font-size: 1.6rem;
+      opacity: 0;
+      transition: opacity 0.25s;
+      font-weight: 300;
+    }
+    .masonry-item:hover .masonry-zoom { opacity: 1; }
+
+    /* ── Testimonials ───────────────────────────────────────────── */
+    #testimonials {
+      padding: 96px 40px;
+      background: var(--charcoal);
+    }
+
+    #testimonials .section-header h2 { color: var(--marble); }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .testimonial {
+      background: rgba(245,242,237,0.05);
+      border: 1px solid rgba(200,184,154,0.15);
+      border-radius: 3px;
+      padding: 36px 28px;
+      position: relative;
+    }
+
+    .testimonial::before {
+      content: '\201C';
+      font-family: var(--font-serif);
+      font-size: 4rem;
+      color: var(--copper);
+      opacity: 0.5;
+      position: absolute;
+      top: 12px; left: 20px;
+      line-height: 1;
+    }
+
+    .testimonial p {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--beige);
+      line-height: 1.7;
+      margin-top: 28px;
+    }
+
+    .testimonial-author {
+      margin-top: 22px;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--travertine);
+      opacity: 0.7;
+    }
+
+    /* ── CTA / Contact ──────────────────────────────────────────── */
+    #contact {
+      padding: 96px 40px;
+      background: var(--copper);
+      text-align: center;
+    }
+
+    #contact .eyebrow { color: var(--ink); opacity: 0.6; }
+
+    #contact h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink);
+      margin-bottom: 14px;
+      line-height: 1.1;
+    }
+
+    #contact p {
+      font-size: 1.05rem;
+      color: rgba(26,23,20,0.75);
+      margin-bottom: 36px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.65;
+    }
+
+    .contact-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--marble);
+      background: var(--ink);
+      padding: 16px 36px;
+      border-radius: 3px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--charcoal);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: transparent;
+      padding: 16px 36px;
+      border-radius: 3px;
+      border: 1.5px solid rgba(26,23,20,0.4);
+      font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: var(--ink);
+      background: rgba(26,23,20,0.08);
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    footer {
+      background: var(--ink);
+      padding: 52px 40px 32px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(200,184,154,0.12);
+    }
+
+    .footer-brand .nav-wordmark {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .footer-brand p {
+      font-size: 0.85rem;
+      color: #7a6f65;
+      line-height: 1.65;
+      max-width: 220px;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--travertine);
+      margin-bottom: 18px;
+      opacity: 0.6;
+    }
+
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a {
+      font-size: 0.85rem;
+      color: #7a6f65;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--travertine); }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-bottom p {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #4a4540;
+    }
+
+    .footer-social a {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--travertine);
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .footer-social a:hover { opacity: 1; }
+
+    /* ── Lightbox ───────────────────────────────────────────────── */
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,23,20,0.95);
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    #lightbox.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 88vh;
+      object-fit: contain;
+      border-radius: 2px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 24px; right: 28px;
+      color: var(--travertine);
+      font-size: 1.8rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .lightbox-close:hover { color: var(--white); }
+
+    .lightbox-caption {
+      position: absolute;
+      bottom: 28px;
+      left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--travertine);
+      opacity: 0.7;
+      white-space: nowrap;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+
+      .hero-headline { padding: 40px 24px 24px; }
+      .hero-grid { grid-template-columns: 1fr; min-height: auto; }
+      .tile-col { display: none; }
+      .hero-center { min-height: 55vw; }
+
+      #stats { flex-wrap: wrap; }
+      .stat { min-width: 50%; }
+
+      #services, #materials, #gallery, #testimonials, #contact { padding: 64px 24px; }
+
+      .services-grid,
+      .materials-grid,
+      .testimonials-grid { grid-template-columns: 1fr 1fr; }
+
+      .masonry { columns: 2; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .services-grid,
+      .materials-grid,
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .masonry { columns: 1; }
+      .footer-inner { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Tooltip (global) -->
+  <div class="tile-tooltip" id="tile-tooltip"></div>
+
+  <!-- ── Lightbox ── -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+    <img id="lightbox-img" src="" alt="Project photo" />
+    <span class="lightbox-caption" id="lightbox-caption"></span>
+  </div>
+
+  <!-- ── Nav ── -->
+  <nav aria-label="Main navigation">
+    <a href="#hero" class="nav-logo" aria-label="Dynamic Tile &amp; Stone home">
+      <div class="nav-logomark" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="nav-wordmark">
+        Dynamic Tile &amp; Stone
+        <small>Washingtonville, NY</small>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#materials">Materials</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Get a Quote</a>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section id="hero">
+    <div class="hero-headline">
+      <p class="hero-eyebrow">Dynamic Tile &amp; Stone Inc. &mdash; Hudson Valley</p>
+      <h1>Every wall<br /><em>here is hovering.</em></h1>
+    </div>
+
+    <div class="hero-grid">
+      <!-- Left tile grid (30 cells) -->
+      <div class="tile-col" id="tile-col-left" aria-hidden="true"></div>
+
+      <!-- Center hero image -->
+      <a href="#contact" class="hero-center" aria-label="View our indoor pool work — scroll to contact">
+        <img src="images/IMG_6462.jpg" alt="Indoor pool tile installation by Dynamic Tile &amp; Stone" />
+        <div class="hero-center-overlay">
+          <span class="hero-center-label">Indoor Pool &amp; Spa</span>
+          <span class="hero-center-cta">Get a Quote</span>
+        </div>
+      </a>
+
+      <!-- Right tile grid (30 cells) -->
+      <div class="tile-col" id="tile-col-right" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- ── Stats bar ── -->
+  <div id="stats" role="region" aria-label="Company highlights">
+    <div class="stat">
+      <div class="stat-number">500+</div>
+      <div class="stat-label">Installs Completed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">18+</div>
+      <div class="stat-label">Years Experience</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">1/16&Prime;</div>
+      <div class="stat-label">Grout Tolerance</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Licensed &amp; Insured</div>
+    </div>
+  </div>
+
+  <!-- ── Services ── -->
+  <section id="services">
+    <div class="section-header">
+      <p class="eyebrow">What we do</p>
+      <h2>Precision in every field.</h2>
+      <p>From kitchen backsplashes to full pool surrounds — we handle every surface with the same obsessive care.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon" aria-hidden="true">&#9635;</div>
+        <h3>Kitchen Backsplash</h3>
+        <p>Subway tile, custom mosaics, and slab backsplashes installed with hairline precision to complement any kitchen aesthetic.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon" aria-hidden="true">&#9672;</div>
+        <h3>Bathroom &amp; Shower</h3>
+        <p>Full bathroom renovations, walk-in showers, steam rooms, and feature walls using premium porcelain and natural stone.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon" aria-hidden="true">&#9673;</div>
+        <h3>Indoor Pools &amp; Spas</h3>
+        <p>Waterline tile, full pool surrounds, and spa installations engineered for long-term durability in wet environments.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon" aria-hidden="true">&#9640;</div>
+        <h3>Flooring</h3>
+        <p>Large-format porcelain, marble, travertine, and wood-look tile laid to exact tolerances on any floor type or radiant system.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon" aria-hidden="true">&#10022;</div>
+        <h3>Custom Mosaics</h3>
+        <p>Bespoke hand-set mosaic work — pebble patterns, inlay medallions, and artistic feature panels designed to your spec.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon" aria-hidden="true">&#11041;</div>
+        <h3>Outdoor &amp; Patio</h3>
+        <p>Frost-resistant porcelain, bluestone, and natural stone for patios, pool decks, and exterior walls built for the Hudson Valley climate.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Materials ── -->
+  <section id="materials">
+    <div class="section-header">
+      <p class="eyebrow">Our palette</p>
+      <h2>Stone, glass, and clay.</h2>
+      <p>We source and install the full range — tap any material to see it up close.</p>
+    </div>
+    <div class="materials-grid">
+      <div class="material-card" data-src="images/IMG_6466.jpg" data-caption="Bookmatched Marble" tabindex="0" role="button" aria-label="View Bookmatched Marble">
+        <img src="images/IMG_6466.jpg" alt="Bookmatched Marble" loading="lazy" />
+        <div class="material-overlay">
+          <span class="material-tag">Natural Stone</span>
+          <span class="material-name">Bookmatched Marble</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card" data-src="images/IMG_6464.jpg" data-caption="Glass Mosaic" tabindex="0" role="button" aria-label="View Glass Mosaic">
+        <img src="images/IMG_6464.jpg" alt="Glass Mosaic" loading="lazy" />
+        <div class="material-overlay">
+          <span class="material-tag">Glass</span>
+          <span class="material-name">Glass Mosaic</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card" data-src="images/IMG_6463.jpg" data-caption="Pebble Mosaic" tabindex="0" role="button" aria-label="View Pebble Mosaic">
+        <img src="images/IMG_6463.jpg" alt="Pebble Mosaic" loading="lazy" />
+        <div class="material-overlay">
+          <span class="material-tag">Natural Stone</span>
+          <span class="material-name">Pebble Mosaic</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card" data-src="images/IMG_6473.jpg" data-caption="Cube Pattern" tabindex="0" role="button" aria-label="View Cube Pattern">
+        <img src="images/IMG_6473.jpg" alt="Cube Pattern" loading="lazy" />
+        <div class="material-overlay">
+          <span class="material-tag">Porcelain</span>
+          <span class="material-name">Cube Pattern</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card" data-src="images/IMG_6460.jpg" data-caption="Wood-Look Porcelain" tabindex="0" role="button" aria-label="View Wood-Look Porcelain">
+        <img src="images/IMG_6460.jpg" alt="Wood-Look Porcelain" loading="lazy" />
+        <div class="material-overlay">
+          <span class="material-tag">Porcelain</span>
+          <span class="material-name">Wood-Look Porcelain</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card" data-src="images/IMG_6467.jpg" data-caption="Subway Tile" tabindex="0" role="button" aria-label="View Subway Tile">
+        <img src="images/IMG_6467.jpg" alt="Subway Tile" loading="lazy" />
+        <div class="material-overlay">
+          <span class="material-tag">Ceramic</span>
+          <span class="material-name">Subway Tile</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Gallery ── -->
+  <section id="gallery">
+    <div class="section-header">
+      <p class="eyebrow">Project gallery</p>
+      <h2>Work that speaks for itself.</h2>
+      <p>Real installations across Washingtonville, Newburgh, and the wider Hudson Valley.</p>
+    </div>
+    <div class="masonry" id="gallery-masonry"></div>
+  </section>
+
+  <!-- ── Testimonials ── -->
+  <section id="testimonials">
+    <div class="section-header">
+      <p class="eyebrow">Client words</p>
+      <h2>Built on trust.</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <p>They tiled our entire master bathroom and shower in marble — every single line is perfect. You can tell these guys genuinely care about their craft. We've gotten more compliments on that bathroom than anything else in our home.</p>
+        <div class="testimonial-author">— Sarah M., Warwick, NY</div>
+      </div>
+      <div class="testimonial">
+        <p>Hired Dynamic Tile for a full kitchen backsplash and entryway floor. Showed up on time every day, zero mess left behind, and the finished work is stunning. They matched the grout color perfectly to a tile they'd never seen before. Impressive.</p>
+        <div class="testimonial-author">— James R., Goshen, NY</div>
+      </div>
+      <div class="testimonial">
+        <p>The pebble mosaic they installed around our pool is absolutely unreal. Neighbors stop and ask about it every week. These are the guys you call when you want it done right the first time — not redone twice by someone else.</p>
+        <div class="testimonial-author">— The DeLuca Family, Middletown, NY</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA / Contact ── -->
+  <section id="contact">
+    <p class="eyebrow">Let's talk</p>
+    <h2>Start your project today.</h2>
+    <p>Based in Washingtonville, NY. Serving the entire Hudson Valley region — Newburgh, Middletown, Monroe, Goshen, and beyond.</p>
+    <div class="contact-actions">
+      <a href="tel:+18455550100" class="btn-primary">Call (845) 555-0100</a>
+      <a href="mailto:info@dynamictileandstone.com" class="btn-secondary">Email Us</a>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="nav-wordmark" style="color:var(--marble); margin-bottom:6px;">
+          Dynamic Tile &amp; Stone
+          <small>Inc. &mdash; Est. 2006</small>
+        </div>
+        <p>Precision tile and natural stone installation serving Washingtonville, NY and the Hudson Valley since 2006.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#services">Kitchen Backsplash</a></li>
+          <li><a href="#services">Bathroom &amp; Shower</a></li>
+          <li><a href="#services">Indoor Pools</a></li>
+          <li><a href="#services">Flooring</a></li>
+          <li><a href="#services">Custom Mosaics</a></li>
+          <li><a href="#services">Outdoor &amp; Patio</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#materials">Materials</a></li>
+          <li><a href="#testimonials">Reviews</a></li>
+          <li><a href="#contact">Get a Quote</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:+18455550100">(845) 555-0100</a></li>
+          <li><a href="mailto:info@dynamictileandstone.com">info@dynamictileandstone.com</a></li>
+          <li><a href="https://www.instagram.com/dynamic.tile.stone.inc" target="_blank" rel="noopener">Instagram &#8599;</a></li>
+          <li><a href="#contact">Washingtonville, NY 10992</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2006&ndash;2026 Dynamic Tile &amp; Stone Inc. All rights reserved.</p>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/dynamic.tile.stone.inc" target="_blank" rel="noopener">@dynamic.tile.stone.inc</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── Scripts ── -->
+  <script>
+    (function () {
+      'use strict';
+
+      // ── Photo pool ──────────────────────────────────────────────
+      var PHOTOS = [
+        'images/IMG_6458.jpg',
+        'images/IMG_6459.jpg',
+        'images/IMG_6460.jpg',
+        'images/IMG_6461.jpg',
+        'images/IMG_6462.jpg',
+        'images/IMG_6463.jpg',
+        'images/IMG_6464.jpg',
+        'images/IMG_6466.jpg',
+        'images/IMG_6467.jpg',
+        'images/IMG_6469.jpg',
+        'images/IMG_6471.jpg',
+        'images/IMG_6473.jpg'
+      ];
+
+      function randomPhoto(exclude) {
+        var pool = exclude ? PHOTOS.filter(function(p){ return p !== exclude; }) : PHOTOS.slice();
+        return pool[Math.floor(Math.random() * pool.length)];
+      }
+
+      // ── Tooltip ─────────────────────────────────────────────────
+      var tooltip = document.getElementById('tile-tooltip');
+
+      function showTooltip(x, y, text) {
+        tooltip.textContent = text;
+        tooltip.style.left = (x + 14) + 'px';
+        tooltip.style.top  = (y - 32) + 'px';
+        tooltip.classList.add('visible');
+      }
+
+      function hideTooltip() {
+        tooltip.classList.remove('visible');
+      }
+
+      // ── Build tile grids ────────────────────────────────────────
+      function buildTileGrid(colEl, count) {
+        for (var i = 0; i < count; i++) {
+          var cell = document.createElement('div');
+          cell.className = 'tile-cell';
+          var photo = randomPhoto();
+          cell.dataset.current = photo;
+          cell.style.backgroundImage = "url('" + photo + "')";
+
+          (function(c) {
+            c.addEventListener('mouseenter', function(e) {
+              var next = randomPhoto(c.dataset.current);
+              c.dataset.current = next;
+              c.style.backgroundImage = "url('" + next + "')";
+              c.classList.remove('flash');
+              void c.offsetWidth;
+              c.classList.add('flash');
+              showTooltip(e.clientX, e.clientY, next.split('/').pop());
+            });
+
+            c.addEventListener('mousemove', function(e) {
+              tooltip.style.left = (e.clientX + 14) + 'px';
+              tooltip.style.top  = (e.clientY - 32) + 'px';
+            });
+
+            c.addEventListener('mouseleave', function() {
+              c.classList.remove('flash');
+              hideTooltip();
+            });
+
+            c.addEventListener('click', function(e) {
+              var next = randomPhoto(c.dataset.current);
+              c.dataset.current = next;
+              c.style.backgroundImage = "url('" + next + "')";
+              c.classList.remove('flash');
+              void c.offsetWidth;
+              c.classList.add('flash');
+              showTooltip(e.clientX, e.clientY, next.split('/').pop());
+            });
+          })(cell);
+
+          colEl.appendChild(cell);
+        }
+      }
+
+      buildTileGrid(document.getElementById('tile-col-left'),  30);
+      buildTileGrid(document.getElementById('tile-col-right'), 30);
+
+      // ── Gallery masonry ─────────────────────────────────────────
+      var masonry = document.getElementById('gallery-masonry');
+      PHOTOS.forEach(function(src) {
+        var item = document.createElement('div');
+        item.className = 'masonry-item';
+        item.dataset.src = src;
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('aria-label', 'Open photo: ' + src.split('/').pop());
+
+        var img = document.createElement('img');
+        img.src = src;
+        img.alt = 'Project — ' + src.split('/').pop().replace('.jpg','');
+        img.loading = 'lazy';
+
+        var overlay = document.createElement('div');
+        overlay.className = 'masonry-item-overlay';
+
+        var zoom = document.createElement('span');
+        zoom.className = 'masonry-zoom';
+        zoom.setAttribute('aria-hidden', 'true');
+        zoom.textContent = '+';
+        overlay.appendChild(zoom);
+
+        item.appendChild(img);
+        item.appendChild(overlay);
+        masonry.appendChild(item);
+      });
+
+      // ── Lightbox ────────────────────────────────────────────────
+      var lightbox    = document.getElementById('lightbox');
+      var lightboxImg = document.getElementById('lightbox-img');
+      var lightboxCap = document.getElementById('lightbox-caption');
+      var lbClose     = document.getElementById('lightbox-close');
+
+      function openLightbox(src, caption) {
+        lightboxImg.src = src;
+        lightboxCap.textContent = caption || src.split('/').pop().replace('.jpg','').replace(/_/g,' ');
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        lbClose.focus();
+      }
+
+      function closeLightbox() {
+        lightbox.classList.remove('open');
+        document.body.style.overflow = '';
+        lightboxImg.src = '';
+      }
+
+      lbClose.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeLightbox();
+      });
+
+      // Materials
+      document.querySelectorAll('.material-card').forEach(function(card) {
+        function activate() { openLightbox(card.dataset.src, card.dataset.caption); }
+        card.addEventListener('click', activate);
+        card.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+        });
+      });
+
+      // Gallery
+      document.querySelectorAll('.masonry-item').forEach(function(item) {
+        function activate() { openLightbox(item.dataset.src); }
+        item.addEventListener('click', activate);
+        item.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+        });
+      });
+
+      // ── Nav active link on scroll ───────────────────────────────
+      var navLinks = document.querySelectorAll('.nav-links a');
+      var sectionEls = document.querySelectorAll('section[id]');
+
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              navLinks.forEach(function(link) {
+                link.style.color = '';
+                if (link.getAttribute('href') === '#' + entry.target.id) {
+                  link.style.color = 'var(--white)';
+                }
+              });
+            }
+          });
+        }, { threshold: 0.45 });
+
+        sectionEls.forEach(function(s) { io.observe(s); });
+      }
+
+    }());
+  </script>
+</body>
+</html>
