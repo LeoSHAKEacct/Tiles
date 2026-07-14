@@ -435,7 +435,7 @@
 
     .materials-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       max-width: 1100px;
       margin: 0 auto;
@@ -457,6 +457,15 @@
     }
 
     .material-card:hover img { transform: scale(1.07); }
+
+    .material-card canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .material-card:hover canvas { transform: scale(1.07); }
 
     .material-overlay {
       position: absolute;
@@ -1062,8 +1071,8 @@
       #visualizer { padding: 64px 24px; }
 
       .services-grid,
-      .materials-grid,
       .testimonials-grid { grid-template-columns: 1fr 1fr; }
+      .materials-grid { grid-template-columns: repeat(3, 1fr); }
 
       .masonry { columns: 2; }
       .footer-inner { grid-template-columns: 1fr 1fr; }
@@ -1075,8 +1084,8 @@
 
     @media (max-width: 600px) {
       .services-grid,
-      .materials-grid,
       .testimonials-grid { grid-template-columns: 1fr; }
+      .materials-grid { grid-template-columns: 1fr 1fr; }
       .masonry { columns: 1; }
       .footer-inner { grid-template-columns: 1fr; }
     }
@@ -1311,6 +1320,54 @@
         <div class="material-overlay">
           <span class="material-tag">Ceramic</span>
           <span class="material-name">Subway Tile</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card material-card--pattern" data-pattern-key="herringbone-marble" data-caption="Calacatta Gold Herringbone" tabindex="0" role="button" aria-label="View Calacatta Gold Herringbone">
+        <canvas class="material-pattern-canvas" width="400" height="300"></canvas>
+        <div class="material-overlay">
+          <span class="material-tag">Natural Stone</span>
+          <span class="material-name">Calacatta Gold Herringbone</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card material-card--pattern" data-pattern-key="checkerboard-marble" data-caption="Checkerboard Marble" tabindex="0" role="button" aria-label="View Checkerboard Marble">
+        <canvas class="material-pattern-canvas" width="400" height="300"></canvas>
+        <div class="material-overlay">
+          <span class="material-tag">Natural Stone</span>
+          <span class="material-name">Checkerboard Marble</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card material-card--pattern" data-pattern-key="zellige" data-caption="Zellige" tabindex="0" role="button" aria-label="View Zellige">
+        <canvas class="material-pattern-canvas" width="400" height="300"></canvas>
+        <div class="material-overlay">
+          <span class="material-tag">Ceramic</span>
+          <span class="material-name">Zellige</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card material-card--pattern" data-pattern-key="terrazzo" data-caption="Terrazzo" tabindex="0" role="button" aria-label="View Terrazzo">
+        <canvas class="material-pattern-canvas" width="400" height="300"></canvas>
+        <div class="material-overlay">
+          <span class="material-tag">Cement</span>
+          <span class="material-name">Terrazzo</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card material-card--pattern" data-pattern-key="hex-marble" data-caption="Hexagon Marble Mosaic" tabindex="0" role="button" aria-label="View Hexagon Marble Mosaic">
+        <canvas class="material-pattern-canvas" width="400" height="300"></canvas>
+        <div class="material-overlay">
+          <span class="material-tag">Natural Stone</span>
+          <span class="material-name">Hexagon Marble Mosaic</span>
+        </div>
+        <span class="material-zoom" aria-hidden="true">&#8599;</span>
+      </div>
+      <div class="material-card material-card--pattern" data-pattern-key="basketweave-marble" data-caption="Basketweave Marble" tabindex="0" role="button" aria-label="View Basketweave Marble">
+        <canvas class="material-pattern-canvas" width="400" height="300"></canvas>
+        <div class="material-overlay">
+          <span class="material-tag">Natural Stone</span>
+          <span class="material-name">Basketweave Marble</span>
         </div>
         <span class="material-zoom" aria-hidden="true">&#8599;</span>
       </div>
@@ -1620,12 +1677,18 @@
       'use strict';
 
       var TILE_STYLES = [
-        { key: 'marble', name: 'Bookmatched Marble' },
-        { key: 'glass',  name: 'Glass Mosaic' },
-        { key: 'pebble', name: 'Pebble Mosaic' },
-        { key: 'cube',   name: 'Cube Pattern' },
-        { key: 'wood',   name: 'Wood-Look Porcelain' },
-        { key: 'subway', name: 'Subway Tile' }
+        { key: 'marble',              name: 'Bookmatched Marble' },
+        { key: 'glass',               name: 'Glass Mosaic' },
+        { key: 'pebble',              name: 'Pebble Mosaic' },
+        { key: 'cube',                name: 'Cube Pattern' },
+        { key: 'wood',                name: 'Wood-Look Porcelain' },
+        { key: 'subway',              name: 'Subway Tile' },
+        { key: 'herringbone-marble',  name: 'Calacatta Gold Herringbone' },
+        { key: 'checkerboard-marble', name: 'Checkerboard Marble' },
+        { key: 'zellige',             name: 'Zellige' },
+        { key: 'terrazzo',            name: 'Terrazzo' },
+        { key: 'hex-marble',          name: 'Hexagon Marble Mosaic' },
+        { key: 'basketweave-marble',  name: 'Basketweave Marble' }
       ];
 
       /* ── Seeded xorshift32 RNG ────────────────── */
@@ -1656,12 +1719,18 @@
         c.width = size; c.height = size;
         var g = c.getContext('2d');
         switch (key) {
-          case 'marble': drawMarble(g, size); break;
-          case 'glass':  drawGlass(g, size);  break;
-          case 'pebble': drawPebble(g, size); break;
-          case 'cube':   drawCube(g, size);   break;
-          case 'wood':   drawWood(g, size);   break;
-          case 'subway': drawSubway(g, size); break;
+          case 'marble':              drawMarble(g, size);             break;
+          case 'glass':               drawGlass(g, size);              break;
+          case 'pebble':              drawPebble(g, size);             break;
+          case 'cube':                drawCube(g, size);               break;
+          case 'wood':                drawWood(g, size);               break;
+          case 'subway':              drawSubway(g, size);             break;
+          case 'herringbone-marble':  drawHerringboneMarble(g, size);  break;
+          case 'checkerboard-marble': drawCheckerboardMarble(g, size); break;
+          case 'zellige':             drawZellige(g, size);            break;
+          case 'terrazzo':            drawTerrazzo(g, size);           break;
+          case 'hex-marble':          drawHexMarble(g, size);          break;
+          case 'basketweave-marble':  drawBasketweaveMarble(g, size);  break;
         }
         return c;
       }
@@ -1977,11 +2046,394 @@
         }
       }
 
-      /* ── Pre-generate all 6 patterns (512×512) ── */
+      /* ── 7. Calacatta Gold Herringbone ──────────── */
+      function drawHerringboneMarble(g, s) {
+        var TW = Math.round(s / 5);   /* plank width  ~102px at 512 */
+        var TH = Math.round(s / 12);  /* plank height ~43px at 512 */
+        var GROUT = 2;
+        var GROUT_COLOR = '#d4cec8';
+        var rng = makeRng(41);
+
+        g.fillStyle = GROUT_COLOR;
+        g.fillRect(0, 0, s, s);
+
+        /* Herringbone: draw horizontal and vertical planks in a zigzag pattern.
+           Each herringbone "unit" consists of one horizontal + one vertical plank.
+           Unit width = TH+GROUT, unit height = TW+GROUT.
+           We tile these units across the canvas with a 45-degree feel by
+           alternating horizontal (H) blocks and vertical (V) blocks per row pair. */
+        var unitW = TH + GROUT;
+        var unitH = TW + GROUT;
+        var cols = Math.ceil(s / unitW) + 4;
+        var rows = Math.ceil(s / unitH) + 4;
+
+        function drawPlank(x, y, w, h, rngInst) {
+          g.save();
+          var gr = g.createLinearGradient(x, y, x, y + h);
+          gr.addColorStop(0,   '#fdfaf4');
+          gr.addColorStop(0.4, '#f8f4ee');
+          gr.addColorStop(1,   '#f0ebe2');
+          g.fillStyle = gr;
+          g.fillRect(x, y, w, h);
+
+          /* Gold-tinged vein */
+          g.beginPath();
+          var vx1 = x + rngInst() * w, vy1 = y;
+          var vx2 = x + rngInst() * w, vy2 = y + h;
+          g.moveTo(vx1, vy1);
+          g.bezierCurveTo(
+            vx1 + (rngInst() - 0.5) * w * 0.4, y + h * 0.33,
+            vx2 + (rngInst() - 0.5) * w * 0.4, y + h * 0.67,
+            vx2, vy2
+          );
+          g.strokeStyle = 'rgba(180,160,110,0.12)';
+          g.lineWidth = 0.6;
+          g.stroke();
+          g.restore();
+        }
+
+        /* Classic herringbone: in each "cell" (col, row), we place two planks:
+           one horizontal, one vertical, forming the V-shape. */
+        for (var row = -2; row < rows; row++) {
+          for (var col = -2; col < cols; col++) {
+            /* Horizontal plank at this cell */
+            var hx = col * (TW + GROUT);
+            var hy = row * (2 * TH + 2 * GROUT) + (col % 2 !== 0 ? TH + GROUT : 0);
+            drawPlank(hx, hy, TW, TH, rng);
+
+            /* Vertical plank: TH wide, TW tall, positioned to the right */
+            var vx = hx + TW + GROUT;
+            var vy = hy - TH - GROUT;
+            drawPlank(vx, vy, TH, TW, rng);
+          }
+        }
+      }
+
+      /* ── 8. Checkerboard Marble ──────────────────── */
+      function drawCheckerboardMarble(g, s) {
+        var SZ = Math.round(s / 8);   /* ~64px at 512 */
+        var GROUT = 2;
+        var GROUT_COLOR = '#b8b4b0';
+        var rng = makeRng(13);
+
+        g.fillStyle = GROUT_COLOR;
+        g.fillRect(0, 0, s, s);
+
+        var cols = Math.ceil(s / (SZ + GROUT)) + 2;
+        var rows = Math.ceil(s / (SZ + GROUT)) + 2;
+
+        for (var row = 0; row < rows; row++) {
+          for (var col = 0; col < cols; col++) {
+            var x = col * (SZ + GROUT);
+            var y = row * (SZ + GROUT);
+            var isWhite = (col + row) % 2 === 0;
+
+            if (isWhite) {
+              /* White marble cell */
+              var wgr = g.createLinearGradient(x, y, x + SZ, y + SZ);
+              wgr.addColorStop(0,   '#fdfaf6');
+              wgr.addColorStop(0.5, '#f5f2ee');
+              wgr.addColorStop(1,   '#ede8e2');
+              g.fillStyle = wgr;
+              g.fillRect(x, y, SZ, SZ);
+
+              /* White marble vein */
+              g.save();
+              g.beginPath();
+              g.moveTo(x + rng() * SZ, y);
+              g.bezierCurveTo(
+                x + rng() * SZ, y + SZ * 0.33,
+                x + rng() * SZ, y + SZ * 0.67,
+                x + rng() * SZ, y + SZ
+              );
+              g.strokeStyle = 'rgba(140,130,120,0.18)';
+              g.lineWidth = 0.8;
+              g.stroke();
+              g.restore();
+            } else {
+              /* Black marble cell */
+              var bgr = g.createLinearGradient(x, y, x + SZ, y + SZ);
+              bgr.addColorStop(0,   '#222018');
+              bgr.addColorStop(0.5, '#1a1816');
+              bgr.addColorStop(1,   '#141210');
+              g.fillStyle = bgr;
+              g.fillRect(x, y, SZ, SZ);
+
+              /* Black marble vein */
+              g.save();
+              g.beginPath();
+              g.moveTo(x + rng() * SZ, y);
+              g.bezierCurveTo(
+                x + rng() * SZ, y + SZ * 0.33,
+                x + rng() * SZ, y + SZ * 0.67,
+                x + rng() * SZ, y + SZ
+              );
+              g.strokeStyle = 'rgba(220,215,210,0.10)';
+              g.lineWidth = 0.8;
+              g.stroke();
+              g.restore();
+            }
+          }
+        }
+      }
+
+      /* ── 9. Zellige ──────────────────────────────── */
+      function drawZellige(g, s) {
+        var SZ = Math.round(s / 12);  /* ~43px at 512 */
+        var GROUT = 3;
+        var GROUT_COLOR = '#c8c4be';
+        var PAL = ['#e8e4dc','#dde8ee','#e4ece8','#e0dcd4','#eaeef2','#dce4e8'];
+        var rng = makeRng(17);
+
+        g.fillStyle = GROUT_COLOR;
+        g.fillRect(0, 0, s, s);
+
+        var UNIT = SZ + GROUT;
+        var cols = Math.ceil(s / UNIT) + 2;
+        var rows = Math.ceil(s / UNIT) + 2;
+
+        for (var row = 0; row < rows; row++) {
+          for (var col = 0; col < cols; col++) {
+            var x = col * UNIT + 1;
+            var y = row * UNIT + 1;
+            var w = SZ - 2;
+            var h = SZ - 2;
+
+            /* Pick palette color and shift brightness */
+            var baseColor = PAL[Math.floor(rng() * PAL.length)];
+            var shift = Math.round((rng() - 0.5) * 2 * 20); /* ±10 luminance */
+            var fillColor = shiftHex(baseColor, shift);
+
+            /* Slightly rounded corners via lineTo/arcTo */
+            var r = 2;
+            g.beginPath();
+            g.moveTo(x + r, y);
+            g.lineTo(x + w - r, y);
+            g.arcTo(x + w, y, x + w, y + r, r);
+            g.lineTo(x + w, y + h - r);
+            g.arcTo(x + w, y + h, x + w - r, y + h, r);
+            g.lineTo(x + r, y + h);
+            g.arcTo(x, y + h, x, y + h - r, r);
+            g.lineTo(x, y + r);
+            g.arcTo(x, y, x + r, y, r);
+            g.closePath();
+            g.fillStyle = fillColor;
+            g.fill();
+
+            /* Subtle inner shadow on right and bottom edges */
+            g.fillStyle = 'rgba(0,0,0,0.08)';
+            g.fillRect(x + w - 2, y, 2, h);
+            g.fillRect(x, y + h - 2, w, 2);
+          }
+        }
+      }
+
+      /* ── 10. Terrazzo ────────────────────────────── */
+      function drawTerrazzo(g, s) {
+        var BASE = '#9e9a96';
+        var CHIP_PAL = ['#ffffff','#1a1816','#c8724a','#7a9870','#c8b890','#d4c8b8','#6a6460'];
+        var rng = makeRng(23);
+
+        /* Cement base */
+        g.fillStyle = BASE;
+        g.fillRect(0, 0, s, s);
+
+        /* Scatter chips in a grid to achieve even coverage */
+        var CELL = 32;
+        var CHIPS_PER_CELL = 5;
+        for (var cy = 0; cy < s; cy += CELL) {
+          for (var cx = 0; cx < s; cx += CELL) {
+            for (var ci = 0; ci < CHIPS_PER_CELL; ci++) {
+              var px = cx + rng() * CELL;
+              var py = cy + rng() * CELL;
+              var radius = 3 + rng() * 5;   /* 3–8px */
+              var sides = 5 + Math.floor(rng() * 3);  /* 5–7 sides */
+              var rotation = rng() * Math.PI * 2;
+              var chipColor = CHIP_PAL[Math.floor(rng() * CHIP_PAL.length)];
+              var alpha = 0.85 + rng() * 0.15;
+
+              g.save();
+              g.globalAlpha = alpha;
+              g.beginPath();
+              for (var si = 0; si < sides; si++) {
+                var angle = rotation + (si / sides) * Math.PI * 2;
+                var rx2 = px + Math.cos(angle) * radius;
+                var ry2 = py + Math.sin(angle) * radius;
+                if (si === 0) g.moveTo(rx2, ry2);
+                else g.lineTo(rx2, ry2);
+              }
+              g.closePath();
+              g.fillStyle = chipColor;
+              g.fill();
+              g.restore();
+            }
+          }
+        }
+
+        /* Subtle circular grind marks */
+        g.save();
+        g.globalAlpha = 0.03;
+        g.strokeStyle = 'rgba(255,255,255,1)';
+        g.lineWidth = 1;
+        var grindRng = makeRng(99);
+        for (var gi = 0; gi < 20; gi++) {
+          var gx = grindRng() * s, gy2 = grindRng() * s;
+          var gr2 = 20 + grindRng() * 40;
+          g.beginPath();
+          g.arc(gx, gy2, gr2, 0, Math.PI * 2);
+          g.stroke();
+        }
+        g.restore();
+      }
+
+      /* ── 11. Hexagon Marble Mosaic ───────────────── */
+      function drawHexMarble(g, s) {
+        var R = Math.round(s / 22);   /* ~23px at 512 */
+        var GROUT_COLOR = '#c8c4be';
+        var rng = makeRng(29);
+
+        g.fillStyle = GROUT_COLOR;
+        g.fillRect(0, 0, s, s);
+
+        var colW = R * Math.sqrt(3);
+        var rowH = R * 1.5;
+
+        var cols = Math.ceil(s / colW) + 3;
+        var rows = Math.ceil(s / rowH) + 3;
+
+        for (var col = -1; col < cols; col++) {
+          for (var row = -1; row < rows; row++) {
+            var cx = col * colW + (row % 2 !== 0 ? colW / 2 : 0);
+            var cy = row * rowH;
+
+            /* Alternate fill */
+            var isLight = (col + row) % 2 === 0;
+            var fillColor = isLight ? '#f2eeea' : '#d8d4ce';
+
+            /* Draw pointed-top hexagon */
+            g.beginPath();
+            for (var vi = 0; vi < 6; vi++) {
+              var angle = (vi * Math.PI) / 3;
+              var hx = cx + R * Math.sin(angle);
+              var hy = cy + R * Math.cos(angle);
+              if (vi === 0) g.moveTo(hx, hy); else g.lineTo(hx, hy);
+            }
+            g.closePath();
+            g.fillStyle = fillColor;
+            g.fill();
+
+            /* Faint vein */
+            var vStartAngle = rng() * Math.PI * 2;
+            var vEndAngle = vStartAngle + Math.PI;
+            g.save();
+            g.beginPath();
+            g.moveTo(
+              cx + R * 0.7 * Math.sin(vStartAngle),
+              cy + R * 0.7 * Math.cos(vStartAngle)
+            );
+            g.bezierCurveTo(
+              cx + (rng() - 0.5) * R * 0.4, cy + (rng() - 0.5) * R * 0.4,
+              cx + (rng() - 0.5) * R * 0.4, cy + (rng() - 0.5) * R * 0.4,
+              cx + R * 0.7 * Math.sin(vEndAngle),
+              cy + R * 0.7 * Math.cos(vEndAngle)
+            );
+            g.strokeStyle = 'rgba(140,130,118,0.15)';
+            g.lineWidth = 0.7;
+            g.stroke();
+            g.restore();
+          }
+        }
+      }
+
+      /* ── 12. Basketweave Marble ──────────────────── */
+      function drawBasketweaveMarble(g, s) {
+        var TW = Math.round(s / 10);     /* ~51px at 512 */
+        var TH = Math.round(TW / 2);     /* ~26px */
+        var GROUT = 2;
+        var GROUT_COLOR = '#ccc8c2';
+        var rng = makeRng(37);
+
+        g.fillStyle = GROUT_COLOR;
+        g.fillRect(0, 0, s, s);
+
+        /* Basketweave unit: one "H-block" (2 horizontal tiles stacked)
+           alternating with one "V-block" (2 vertical tiles side-by-side).
+           Unit cell width = TW + GROUT, unit cell height = 2*(TH+GROUT).
+           Actually the full basketweave repeating unit is 2 cells wide × 2 cells tall. */
+        var unitW = TW + GROUT;
+        var unitH = 2 * TH + 2 * GROUT;
+        var cols = Math.ceil(s / unitW) + 3;
+        var rows = Math.ceil(s / unitH) + 3;
+
+        function drawMarbleTile(x, y, w, h, rngI) {
+          var gr = g.createLinearGradient(x, y, x, y + h);
+          gr.addColorStop(0,   '#fdfaf5');
+          gr.addColorStop(0.5, '#f8f4ee');
+          gr.addColorStop(1,   '#eeebe4');
+          g.fillStyle = gr;
+          g.fillRect(x + 1, y + 1, w - 1, h - 1);
+
+          /* Faint vein */
+          g.save();
+          g.beginPath();
+          var vx = x + rngI() * w;
+          g.moveTo(vx, y);
+          g.bezierCurveTo(
+            vx + (rngI() - 0.5) * w * 0.5, y + h * 0.4,
+            vx + (rngI() - 0.5) * w * 0.5, y + h * 0.7,
+            x + rngI() * w, y + h
+          );
+          g.strokeStyle = 'rgba(160,148,130,0.14)';
+          g.lineWidth = 0.6;
+          g.stroke();
+          g.restore();
+        }
+
+        for (var row = -2; row < rows; row++) {
+          for (var col = -2; col < cols; col++) {
+            var isHBlock = ((Math.floor(col) + Math.floor(row)) % 2 === 0);
+            var bx = col * unitW;
+            var by = row * unitH;
+
+            if (isHBlock) {
+              /* 2 horizontal tiles stacked */
+              drawMarbleTile(bx, by, TW, TH, rng);
+              drawMarbleTile(bx, by + TH + GROUT, TW, TH, rng);
+            } else {
+              /* 2 vertical tiles side by side */
+              drawMarbleTile(bx, by, TH, TW * 2 / 3 + TH, rng);
+              drawMarbleTile(bx + TH + GROUT, by, TH, TW * 2 / 3 + TH, rng);
+            }
+          }
+        }
+      }
+
+      /* ── Pre-generate all 12 patterns (512×512) ── */
       var PAT_SIZE = 512;
       var patternCanvases = {};
       TILE_STYLES.forEach(function (style) {
-        patternCanvases[style.key] = generateTilePattern(style.key, PAT_SIZE);
+        try {
+          patternCanvases[style.key] = generateTilePattern(style.key, PAT_SIZE);
+        } catch (err) {
+          console.error('[Visualizer] Pattern generation failed for "' + style.key + '":', err);
+          var fb = document.createElement('canvas');
+          fb.width = PAT_SIZE; fb.height = PAT_SIZE;
+          var fctx = fb.getContext('2d');
+          if (fctx) { fctx.fillStyle = '#c8c0b8'; fctx.fillRect(0, 0, PAT_SIZE, PAT_SIZE); }
+          patternCanvases[style.key] = fb;
+        }
+      });
+
+      /* ── Populate pattern material cards ──────────────── */
+      document.querySelectorAll('.material-card--pattern').forEach(function(card) {
+        var key = card.dataset.patternKey;
+        var cv  = card.querySelector('.material-pattern-canvas');
+        if (!cv || !key || !patternCanvases[key]) return;
+        try {
+          var ctx2 = cv.getContext('2d');
+          if (ctx2) ctx2.drawImage(patternCanvases[key], 0, 0, cv.width, cv.height);
+          card.dataset.src = cv.toDataURL('image/jpeg', 0.92);
+        } catch(e) { /* ignore if canvas export fails */ }
       });
 
       /* ── DOM refs ─────────────────────────────── */
@@ -2017,7 +2469,10 @@
         var thumb = document.createElement('canvas');
         thumb.width = 96; thumb.height = 96;
         thumb.style.cssText = 'width:100%;height:100%;display:block;';
-        thumb.getContext('2d').drawImage(patternCanvases[style.key], 0, 0, 96, 96);
+        var thumbCtx = thumb.getContext('2d');
+        if (thumbCtx && patternCanvases[style.key]) {
+          thumbCtx.drawImage(patternCanvases[style.key], 0, 0, 96, 96);
+        }
 
         var lbl = document.createElement('span');
         lbl.className = 'viz-swatch-name';
