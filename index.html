@@ -839,6 +839,208 @@
       white-space: nowrap;
     }
 
+    /* ── Visualizer ─────────────────────────────────────────────── */
+    #visualizer {
+      padding: 96px 40px;
+      background: var(--beige);
+    }
+
+    .viz-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    .viz-layout.viz-loaded {
+      grid-template-columns: 1fr 188px;
+    }
+
+    .viz-canvas-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .viz-dropzone {
+      border: 2px dashed rgba(184,115,51,0.38);
+      border-radius: 4px;
+      background: var(--marble);
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      padding: 48px 40px;
+      text-align: center;
+      user-select: none;
+    }
+
+    .viz-dropzone:hover,
+    .viz-dropzone.drag-over {
+      border-color: var(--copper);
+      background: var(--white);
+    }
+
+    .viz-drop-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(184,115,51,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: var(--copper);
+    }
+
+    .viz-drop-title {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--stone);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .viz-drop-sub {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--travertine);
+    }
+
+    #viz-canvas {
+      display: none;
+      max-width: 100%;
+      border-radius: 3px;
+      box-shadow: 0 4px 24px rgba(26,23,20,0.14);
+      cursor: crosshair;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .viz-instruction {
+      display: none;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #7a6f65;
+      text-align: center;
+    }
+
+    .viz-controls {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .viz-btn {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--stone);
+      background: var(--marble);
+      border: 1px solid rgba(200,184,154,0.55);
+      padding: 10px 16px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      line-height: 1;
+    }
+
+    .viz-btn:hover {
+      background: var(--white);
+      border-color: var(--copper);
+      color: var(--ink);
+    }
+
+    .viz-quote-btn {
+      font-size: 0.66rem;
+      padding: 10px 18px;
+      display: inline-block;
+    }
+
+    .viz-active-label {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .viz-swatches-col {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .viz-swatch {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      background: none;
+      padding: 0;
+      transition: border-color 0.18s, transform 0.15s, box-shadow 0.18s;
+      flex-shrink: 0;
+    }
+
+    .viz-swatch img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    .viz-swatch:hover {
+      transform: scale(1.04);
+      border-color: rgba(184,115,51,0.55);
+    }
+
+    .viz-swatch.active {
+      border-color: var(--copper);
+      box-shadow: 0 0 0 2px var(--copper);
+    }
+
+    .viz-swatch-name {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(26,23,20,0.78);
+      font-family: var(--font-mono);
+      font-size: 0.46rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--travertine);
+      padding: 4px 5px;
+      text-align: center;
+      line-height: 1.4;
+      pointer-events: none;
+    }
+
+    .viz-layout.viz-loaded #viz-canvas      { display: block; }
+    .viz-layout.viz-loaded .viz-instruction { display: block; }
+    .viz-layout.viz-loaded .viz-controls    { display: flex;  }
+    .viz-layout.viz-loaded .viz-swatches-col{ display: flex;  }
+    .viz-layout.viz-loaded .viz-dropzone    { display: none;  }
+
     /* ── Responsive ─────────────────────────────────────────────── */
     @media (max-width: 900px) {
       nav { padding: 0 24px; }
@@ -853,6 +1055,7 @@
       .stat { min-width: 50%; }
 
       #services, #materials, #gallery, #testimonials, #contact { padding: 64px 24px; }
+      #visualizer { padding: 64px 24px; }
 
       .services-grid,
       .materials-grid,
@@ -860,6 +1063,10 @@
 
       .masonry { columns: 2; }
       .footer-inner { grid-template-columns: 1fr 1fr; }
+
+      .viz-layout.viz-loaded { grid-template-columns: 1fr; }
+      .viz-swatches-col { flex-direction: row !important; overflow-x: auto; padding-bottom: 4px; }
+      .viz-swatch { width: 82px; aspect-ratio: 1; }
     }
 
     @media (max-width: 600px) {
@@ -897,6 +1104,7 @@
     <ul class="nav-links">
       <li><a href="#services">Services</a></li>
       <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#visualizer">Visualize</a></li>
       <li><a href="#materials">Materials</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
@@ -961,6 +1169,49 @@
       <div class="stat-label">Licensed &amp; Insured</div>
     </div>
   </div>
+
+  <!-- ── Visualizer ── -->
+  <section id="visualizer" aria-label="Room tile visualizer">
+    <div class="section-header">
+      <p class="eyebrow">Try It Yourself</p>
+      <h2>See it in your space.</h2>
+      <p>Upload a photo of your room, drag the corners to outline your floor, then tap any tile style to preview it — no app, no account, nothing leaves your device.</p>
+    </div>
+    <div class="viz-layout" id="viz-layout">
+
+      <!-- Left: canvas / upload -->
+      <div class="viz-canvas-col">
+
+        <!-- Empty state dropzone -->
+        <div class="viz-dropzone" id="viz-dropzone" role="button" tabindex="0" aria-label="Upload a photo of your room">
+          <div class="viz-drop-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <p class="viz-drop-title">Upload a photo of your room</p>
+          <p class="viz-drop-sub">Drag &amp; drop or click to browse</p>
+          <input type="file" id="viz-file-input" accept="image/*" aria-hidden="true" tabindex="-1" />
+        </div>
+
+        <!-- Canvas (hidden until image loaded) -->
+        <canvas id="viz-canvas" aria-label="Room tile preview canvas"></canvas>
+
+        <!-- Instruction -->
+        <p class="viz-instruction" id="viz-instruction">Drag the 4 corner handles to outline your floor, then pick a tile style.</p>
+
+        <!-- Controls -->
+        <div class="viz-controls" id="viz-controls" role="group" aria-label="Visualizer controls">
+          <button class="viz-btn" id="viz-reset" type="button">Reset Corners</button>
+          <button class="viz-btn" id="viz-download" type="button">Download Image</button>
+          <a href="#contact" class="btn-primary viz-quote-btn">Love this look? Get a Quote</a>
+          <span class="viz-active-label" id="viz-active-label" aria-live="polite">No tile selected</span>
+        </div>
+      </div>
+
+      <!-- Right: style swatches (hidden until image loaded) -->
+      <div class="viz-swatches-col" id="viz-swatches-col" role="group" aria-label="Tile styles"></div>
+
+    </div>
+  </section>
 
   <!-- ── Services ── -->
   <section id="services">
@@ -1357,6 +1608,417 @@
 
         sectionEls.forEach(function(s) { io.observe(s); });
       }
+
+    }());
+
+    /* ── Room Tile Visualizer ──────────────────────────────── */
+    (function () {
+      'use strict';
+
+      var TILE_STYLES = [
+        { src: 'images/IMG_6466.jpg', name: 'Bookmatched Marble' },
+        { src: 'images/IMG_6464.jpg', name: 'Glass Mosaic' },
+        { src: 'images/IMG_6463.jpg', name: 'Pebble Mosaic' },
+        { src: 'images/IMG_6473.jpg', name: 'Cube Pattern' },
+        { src: 'images/IMG_6460.jpg', name: 'Wood-Look Porcelain' },
+        { src: 'images/IMG_6467.jpg', name: 'Subway Tile' }
+      ];
+
+      /* ── DOM refs ─────────────────────────────── */
+      var vizLayout    = document.getElementById('viz-layout');
+      var dropzone     = document.getElementById('viz-dropzone');
+      var fileInput    = document.getElementById('viz-file-input');
+      var canvas       = document.getElementById('viz-canvas');
+      var ctx          = canvas.getContext('2d');
+      var instruction  = document.getElementById('viz-instruction');
+      var controls     = document.getElementById('viz-controls');
+      var swatchesCol  = document.getElementById('viz-swatches-col');
+      var activeLabel  = document.getElementById('viz-active-label');
+      var resetBtn     = document.getElementById('viz-reset');
+      var downloadBtn  = document.getElementById('viz-download');
+
+      /* ── State ────────────────────────────────── */
+      var roomImg      = null;
+      var tileImgCache = {};   // src → Image
+      var activeTile   = null; // { src, name }
+      var corners      = [];   // [{x,y}] order: TL, TR, BR, BL
+      var activeHandle = -1;
+      var rafPending   = false;
+
+      /* Offscreen canvas for tile warp composite */
+      var offCanvas    = document.createElement('canvas');
+      var offCtx       = offCanvas.getContext('2d');
+
+      /* ── Build swatches ───────────────────────── */
+      TILE_STYLES.forEach(function (style) {
+        var btn = document.createElement('button');
+        btn.className = 'viz-swatch';
+        btn.setAttribute('type', 'button');
+        btn.setAttribute('aria-label', style.name);
+        btn.dataset.src = style.src;
+
+        var img = document.createElement('img');
+        img.src = style.src;
+        img.alt = style.name;
+        img.loading = 'lazy';
+
+        var lbl = document.createElement('span');
+        lbl.className = 'viz-swatch-name';
+        lbl.textContent = style.name;
+
+        btn.appendChild(img);
+        btn.appendChild(lbl);
+        swatchesCol.appendChild(btn);
+
+        /* Pre-load tile image for canvas use */
+        var ti = new Image();
+        ti.crossOrigin = 'anonymous';
+        ti.src = style.src;
+        tileImgCache[style.src] = ti;
+
+        btn.addEventListener('click', function () {
+          setActiveTile(style, btn);
+        });
+      });
+
+      function setActiveTile(style, btn) {
+        activeTile = style;
+        activeLabel.textContent = 'Showing: ' + style.name;
+        document.querySelectorAll('.viz-swatch').forEach(function (s) {
+          s.classList.remove('active');
+        });
+        if (btn) btn.classList.add('active');
+        scheduleRender();
+      }
+
+      /* ── Dropzone interaction ─────────────────── */
+      dropzone.addEventListener('click', function () { fileInput.click(); });
+      dropzone.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+      });
+      dropzone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzone.classList.add('drag-over');
+      });
+      dropzone.addEventListener('dragleave', function () {
+        dropzone.classList.remove('drag-over');
+      });
+      dropzone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzone.classList.remove('drag-over');
+        var file = e.dataTransfer && e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) loadFile(file);
+      });
+      fileInput.addEventListener('change', function () {
+        if (fileInput.files[0]) loadFile(fileInput.files[0]);
+      });
+
+      function loadFile(file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var img = new Image();
+          img.onload = function () {
+            roomImg = img;
+            setupCanvas();
+            vizLayout.classList.add('viz-loaded');
+            render();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      /* ── Canvas setup ─────────────────────────── */
+      function setupCanvas() {
+        var MAX_W = 900, MAX_H = 620;
+        var scale = Math.min(
+          MAX_W / roomImg.naturalWidth,
+          MAX_H / roomImg.naturalHeight,
+          1
+        );
+        canvas.width  = Math.round(roomImg.naturalWidth  * scale);
+        canvas.height = Math.round(roomImg.naturalHeight * scale);
+
+        /* Clamp to actual container width */
+        var contW = canvas.parentElement.offsetWidth || MAX_W;
+        if (canvas.width > contW) {
+          var r = contW / canvas.width;
+          canvas.width  = contW;
+          canvas.height = Math.round(canvas.height * r);
+        }
+
+        offCanvas.width  = canvas.width;
+        offCanvas.height = canvas.height;
+        resetCorners();
+      }
+
+      function resetCorners() {
+        var W = canvas.width, H = canvas.height;
+        corners = [
+          { x: 0.35 * W, y: 0.55 * H }, // TL
+          { x: 0.65 * W, y: 0.55 * H }, // TR
+          { x: 0.85 * W, y: 0.90 * H }, // BR
+          { x: 0.15 * W, y: 0.90 * H }  // BL
+        ];
+      }
+
+      /* ── Render ───────────────────────────────── */
+      function scheduleRender() {
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(function () {
+          rafPending = false;
+          render();
+        });
+      }
+
+      function render() {
+        if (!roomImg) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(roomImg, 0, 0, canvas.width, canvas.height);
+
+        if (activeTile) {
+          var ti = tileImgCache[activeTile.src];
+          if (ti && ti.complete && ti.naturalWidth > 0) {
+            warpTile(ti);
+          } else if (ti) {
+            ti.onload = scheduleRender;
+          }
+        }
+
+        drawHandles();
+      }
+
+      /* ── Perspective warp (affine triangle split) ── */
+      function warpTile(tileImg) {
+        var TL = corners[0], TR = corners[1], BR = corners[2], BL = corners[3];
+        var SW = tileImg.naturalWidth, SH = tileImg.naturalHeight;
+
+        offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
+
+        /*
+         * Triangle 1: source (0,0),(SW,0),(0,SH) → dest TL, TR, BL
+         * Triangle 2: source (SW,SH),(SW,0),(0,SH) → dest BR, TR, BL
+         */
+        drawWarpTri(offCtx, tileImg, SW, SH,
+          0,  0,  SW, 0,  0,  SH,
+          TL.x, TL.y,  TR.x, TR.y,  BL.x, BL.y);
+
+        drawWarpTri(offCtx, tileImg, SW, SH,
+          SW, SH,  SW, 0,  0, SH,
+          BR.x, BR.y,  TR.x, TR.y,  BL.x, BL.y);
+
+        /* Composite warped tile onto room photo with multiply blend */
+        ctx.save();
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.globalAlpha = 0.9;
+        ctx.drawImage(offCanvas, 0, 0);
+        ctx.restore();
+      }
+
+      function drawWarpTri(tctx, img, sw, sh,
+          sx0, sy0, sx1, sy1, sx2, sy2,
+          dx0, dy0, dx1, dy1, dx2, dy2) {
+
+        var t = solveAffine(
+          sx0, sy0, sx1, sy1, sx2, sy2,
+          dx0, dy0, dx1, dy1, dx2, dy2
+        );
+        if (!t) return;
+
+        tctx.save();
+        /* Clip to destination triangle */
+        tctx.beginPath();
+        tctx.moveTo(dx0, dy0);
+        tctx.lineTo(dx1, dy1);
+        tctx.lineTo(dx2, dy2);
+        tctx.closePath();
+        tctx.clip();
+        /* Apply affine transform: maps image (src) coords → canvas (dest) coords */
+        tctx.transform(t.a, t.b, t.c, t.d, t.e, t.f);
+        tctx.drawImage(img, 0, 0, sw, sh);
+        tctx.restore();
+      }
+
+      /*
+       * Solve for affine params {a,b,c,d,e,f} such that:
+       *   a·sx + c·sy + e = dx
+       *   b·sx + d·sy + f = dy
+       * for three point pairs.
+       * canvas ctx.transform(a,b,c,d,e,f) applies:
+       *   x' = a·x + c·y + e
+       *   y' = b·x + d·y + f
+       */
+      function solveAffine(sx0, sy0, sx1, sy1, sx2, sy2,
+                           dx0, dy0, dx1, dy1, dx2, dy2) {
+        var M = [sx0, sy0, 1,
+                 sx1, sy1, 1,
+                 sx2, sy2, 1];
+        var inv = invertMat3(M);
+        if (!inv) return null;
+
+        return {
+          a: inv[0]*dx0 + inv[1]*dx1 + inv[2]*dx2,
+          c: inv[3]*dx0 + inv[4]*dx1 + inv[5]*dx2,
+          e: inv[6]*dx0 + inv[7]*dx1 + inv[8]*dx2,
+          b: inv[0]*dy0 + inv[1]*dy1 + inv[2]*dy2,
+          d: inv[3]*dy0 + inv[4]*dy1 + inv[5]*dy2,
+          f: inv[6]*dy0 + inv[7]*dy1 + inv[8]*dy2
+        };
+      }
+
+      function invertMat3(m) {
+        var a=m[0], b=m[1], c=m[2],
+            d=m[3], e=m[4], f=m[5],
+            g=m[6], h=m[7], k=m[8];
+        var A =  e*k - f*h;
+        var B = -(d*k - f*g);
+        var C =  d*h - e*g;
+        var det = a*A + b*B + c*C;
+        if (Math.abs(det) < 1e-10) return null;
+        var s = 1 / det;
+        return [
+           A*s,            -(b*k - c*h)*s,  (b*f - c*e)*s,
+           B*s,             (a*k - c*g)*s, -(a*f - c*d)*s,
+           C*s,            -(a*h - b*g)*s,  (a*e - b*d)*s
+        ];
+      }
+
+      /* ── Draw corner handles ──────────────────── */
+      var HANDLE_R   = 10;  // visual radius
+      var HANDLE_HIT = 22;  // hit-test radius (larger for touch)
+
+      function drawHandles() {
+        /* Connecting quad outline */
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,255,255,0.72)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(corners[0].x, corners[0].y);
+        ctx.lineTo(corners[1].x, corners[1].y);
+        ctx.lineTo(corners[2].x, corners[2].y);
+        ctx.lineTo(corners[3].x, corners[3].y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+
+        /* Handles */
+        corners.forEach(function (pt) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,0.45)';
+          ctx.shadowBlur  = 8;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, HANDLE_R, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+          ctx.strokeStyle = '#b87333';
+          ctx.lineWidth = 2.5;
+          ctx.shadowBlur = 0;
+          ctx.stroke();
+          ctx.restore();
+        });
+      }
+
+      /* ── Mouse / Touch dragging ───────────────── */
+      function canvasPos(clientX, clientY) {
+        var rect   = canvas.getBoundingClientRect();
+        var scaleX = canvas.width  / rect.width;
+        var scaleY = canvas.height / rect.height;
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top)  * scaleY
+        };
+      }
+
+      function nearestHandle(pos) {
+        for (var i = 0; i < corners.length; i++) {
+          var dx = pos.x - corners[i].x;
+          var dy = pos.y - corners[i].y;
+          if (Math.sqrt(dx*dx + dy*dy) <= HANDLE_HIT) return i;
+        }
+        return -1;
+      }
+
+      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+      canvas.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        activeHandle = nearestHandle(canvasPos(e.clientX, e.clientY));
+      });
+
+      window.addEventListener('mousemove', function (e) {
+        if (activeHandle < 0 || !roomImg) return;
+        var p = canvasPos(e.clientX, e.clientY);
+        corners[activeHandle].x = clamp(p.x, 0, canvas.width);
+        corners[activeHandle].y = clamp(p.y, 0, canvas.height);
+        scheduleRender();
+      });
+
+      window.addEventListener('mouseup', function () {
+        activeHandle = -1;
+      });
+
+      canvas.addEventListener('touchstart', function (e) {
+        e.preventDefault();
+        var t = e.touches[0];
+        activeHandle = nearestHandle(canvasPos(t.clientX, t.clientY));
+      }, { passive: false });
+
+      window.addEventListener('touchmove', function (e) {
+        if (activeHandle < 0 || !roomImg) return;
+        e.preventDefault();
+        var t = e.touches[0];
+        var p = canvasPos(t.clientX, t.clientY);
+        corners[activeHandle].x = clamp(p.x, 0, canvas.width);
+        corners[activeHandle].y = clamp(p.y, 0, canvas.height);
+        scheduleRender();
+      }, { passive: false });
+
+      window.addEventListener('touchend', function () {
+        activeHandle = -1;
+      });
+
+      /* ── Controls ─────────────────────────────── */
+      resetBtn.addEventListener('click', function () {
+        resetCorners();
+        scheduleRender();
+      });
+
+      downloadBtn.addEventListener('click', function () {
+        /* Render a clean composite (no handles) to a temp canvas */
+        var tmp  = document.createElement('canvas');
+        tmp.width  = canvas.width;
+        tmp.height = canvas.height;
+        var tc = tmp.getContext('2d');
+        tc.drawImage(roomImg, 0, 0, canvas.width, canvas.height);
+        if (activeTile) {
+          var ti = tileImgCache[activeTile.src];
+          if (ti && ti.complete && ti.naturalWidth > 0) {
+            var TL = corners[0], TR = corners[1], BR = corners[2], BL = corners[3];
+            var SW = ti.naturalWidth, SH = ti.naturalHeight;
+            var tmpOff = document.createElement('canvas');
+            tmpOff.width  = canvas.width;
+            tmpOff.height = canvas.height;
+            var toc = tmpOff.getContext('2d');
+            drawWarpTri(toc, ti, SW, SH,
+              0,  0,  SW, 0,  0,  SH,
+              TL.x, TL.y,  TR.x, TR.y,  BL.x, BL.y);
+            drawWarpTri(toc, ti, SW, SH,
+              SW, SH,  SW, 0,  0, SH,
+              BR.x, BR.y,  TR.x, TR.y,  BL.x, BL.y);
+            tc.save();
+            tc.globalCompositeOperation = 'multiply';
+            tc.globalAlpha = 0.9;
+            tc.drawImage(tmpOff, 0, 0);
+            tc.restore();
+          }
+        }
+        var link = document.createElement('a');
+        link.download = 'tile-visualization.png';
+        link.href = tmp.toDataURL('image/png');
+        link.click();
+      });
 
     }());
   </script>
