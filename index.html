@@ -887,6 +887,9 @@
       background: var(--white);
     }
 
+    /* Force all drag events to land on the dropzone itself, not its children */
+    .viz-dropzone > * { pointer-events: none; }
+
     .viz-drop-icon {
       width: 56px;
       height: 56px;
@@ -1696,18 +1699,31 @@
       dropzone.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
       });
-      dropzone.addEventListener('dragover', function (e) {
+      dropzone.addEventListener('dragenter', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         dropzone.classList.add('drag-over');
       });
-      dropzone.addEventListener('dragleave', function () {
-        dropzone.classList.remove('drag-over');
+      dropzone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('drag-over');
+      });
+      dropzone.addEventListener('dragleave', function (e) {
+        /* Only remove highlight when truly leaving the dropzone (not a child) */
+        if (!dropzone.contains(e.relatedTarget)) {
+          dropzone.classList.remove('drag-over');
+        }
       });
       dropzone.addEventListener('drop', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         dropzone.classList.remove('drag-over');
-        var file = e.dataTransfer && e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) loadFile(file);
+        var dt = e.dataTransfer;
+        var file = dt && dt.files && dt.files[0];
+        if (file && file.type.startsWith('image/')) {
+          loadFile(file);
+        }
       });
       fileInput.addEventListener('change', function () {
         if (fileInput.files[0]) loadFile(fileInput.files[0]);
