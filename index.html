@@ -1005,7 +1005,8 @@
       flex-shrink: 0;
     }
 
-    .viz-swatch img {
+    .viz-swatch img,
+    .viz-swatch canvas {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -1619,69 +1620,414 @@
       'use strict';
 
       var TILE_STYLES = [
-        { src: 'images/IMG_6466.jpg', name: 'Bookmatched Marble' },
-        { src: 'images/IMG_6464.jpg', name: 'Glass Mosaic' },
-        { src: 'images/IMG_6463.jpg', name: 'Pebble Mosaic' },
-        { src: 'images/IMG_6473.jpg', name: 'Cube Pattern' },
-        { src: 'images/IMG_6460.jpg', name: 'Wood-Look Porcelain' },
-        { src: 'images/IMG_6467.jpg', name: 'Subway Tile' }
+        { key: 'marble', name: 'Bookmatched Marble' },
+        { key: 'glass',  name: 'Glass Mosaic' },
+        { key: 'pebble', name: 'Pebble Mosaic' },
+        { key: 'cube',   name: 'Cube Pattern' },
+        { key: 'wood',   name: 'Wood-Look Porcelain' },
+        { key: 'subway', name: 'Subway Tile' }
       ];
 
+      /* ── Seeded xorshift32 RNG ────────────────── */
+      function makeRng(seed) {
+        var s = (seed >>> 0) || 1;
+        return function () {
+          s ^= s << 13; s ^= s >>> 17; s ^= s << 5;
+          return (s >>> 0) / 4294967296;
+        };
+      }
+
+      /* ── Hex color helper ─────────────────────── */
+      function hexByte(n) { var h = n.toString(16); return h.length < 2 ? '0' + h : h; }
+      function shiftHex(hex, amt) {
+        var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+        var cl = function(v){ return Math.min(255, Math.max(0, v + amt)); };
+        return '#' + hexByte(cl(r)) + hexByte(cl(g)) + hexByte(cl(b));
+      }
+
+      /* ══════════════════════════════════════════════════════
+         PATTERN GENERATORS — each draws to a 2D context
+         and returns nothing (ctx is already on the canvas).
+         generateTilePattern(key, size) returns a <canvas>.
+         ══════════════════════════════════════════════════════ */
+
+      function generateTilePattern(key, size) {
+        var c = document.createElement('canvas');
+        c.width = size; c.height = size;
+        var g = c.getContext('2d');
+        switch (key) {
+          case 'marble': drawMarble(g, size); break;
+          case 'glass':  drawGlass(g, size);  break;
+          case 'pebble': drawPebble(g, size); break;
+          case 'cube':   drawCube(g, size);   break;
+          case 'wood':   drawWood(g, size);   break;
+          case 'subway': drawSubway(g, size); break;
+        }
+        return c;
+      }
+
+      /* ── 1. Bookmatched Marble ────────────────── */
+      function drawMarble(g, s) {
+        /* Warm cream base */
+        g.fillStyle = '#f5f0e8';
+        g.fillRect(0, 0, s, s);
+
+        /* Directional depth gradient */
+        var gr = g.createLinearGradient(0, 0, s, s);
+        gr.addColorStop(0,   'rgba(255,253,248,0.55)');
+        gr.addColorStop(0.5, 'rgba(242,236,226,0.22)');
+        gr.addColorStop(1,   'rgba(228,220,208,0.42)');
+        g.fillStyle = gr;
+        g.fillRect(0, 0, s, s);
+
+        /* Main veins [x1,y1, cp1x,cp1y, cp2x,cp2y, x2,y2, lw, alpha] */
+        var veins = [
+          [0,      s*.30, s*.24, s*.16, s*.60, s*.44, s,      s*.54, 2.4, .30],
+          [0,      s*.34, s*.20, s*.22, s*.57, s*.48, s,      s*.58, 0.9, .14],
+          [s*.16,  0,     s*.28, s*.32, s*.52, s*.68, s*.73,  s,     2.0, .26],
+          [s*.19,  0,     s*.30, s*.36, s*.55, s*.71, s*.76,  s,     0.7, .12],
+          [s*.54,  0,     s*.60, s*.26, s*.78, s*.56, s,      s*.70, 1.5, .20],
+          [s*.57,  0,     s*.63, s*.29, s*.81, s*.59, s,      s*.73, 0.6, .10],
+          [0,      s*.68, s*.18, s*.55, s*.44, s*.82, s*.60,  s,     1.2, .16],
+        ];
+
+        g.save();
+        veins.forEach(function (v) {
+          g.shadowBlur = 5; g.shadowColor = 'rgba(110,95,78,.14)';
+          g.beginPath();
+          g.moveTo(v[0], v[1]);
+          g.bezierCurveTo(v[2], v[3], v[4], v[5], v[6], v[7]);
+          g.strokeStyle = 'rgba(128,114,96,' + v[9] + ')';
+          g.lineWidth = v[8];
+          g.stroke();
+          /* Thin hairline offset */
+          g.shadowBlur = 0;
+          g.beginPath();
+          g.moveTo(v[0]+3,  v[1]+2);
+          g.bezierCurveTo(v[2]+4, v[3]+1, v[4]-3, v[5]+3, v[6]+3, v[7]-2);
+          g.strokeStyle = 'rgba(148,134,116,' + (v[9]*.45) + ')';
+          g.lineWidth = v[8] * .38;
+          g.stroke();
+        });
+        g.shadowBlur = 0;
+        g.restore();
+
+        /* Scattered micro-veins */
+        var rng = makeRng(7);
+        g.save(); g.globalAlpha = .14; g.strokeStyle = '#8a7a68'; g.lineWidth = .5;
+        for (var i = 0; i < 10; i++) {
+          var ox = rng()*s, oy = rng()*s;
+          g.beginPath(); g.moveTo(ox, oy);
+          g.bezierCurveTo(
+            ox + (rng()-.5)*s*.38, oy + (rng()-.5)*s*.28,
+            ox + (rng()-.5)*s*.35, oy + (rng()-.5)*s*.25,
+            ox + (rng()-.5)*s*.44, oy + (rng()-.5)*s*.36);
+          g.stroke();
+        }
+        g.restore();
+
+        /* Subtle vignette */
+        var vig = g.createRadialGradient(s*.5, s*.5, s*.1, s*.5, s*.5, s*.78);
+        vig.addColorStop(0, 'rgba(255,252,246,.08)');
+        vig.addColorStop(1, 'rgba(210,202,190,.14)');
+        g.fillStyle = vig; g.fillRect(0, 0, s, s);
+      }
+
+      /* ── 2. Glass Mosaic ──────────────────────── */
+      function drawGlass(g, s) {
+        var TILE  = Math.round(s / 34); /* ~15px at 512 */
+        var GROUT = 2;
+        var UNIT  = TILE + GROUT;
+        var rng   = makeRng(3);
+        var PAL   = ['#3a8fa8','#4aa2bc','#56b0cc','#2c80a0','#68bcd2',
+                     '#3d9ab0','#50b8c4','#2e8ea8','#44a4c0','#60c0d0'];
+
+        /* Grout fill */
+        g.fillStyle = '#b8bfc4';
+        g.fillRect(0, 0, s, s);
+
+        var cols = Math.ceil(s / UNIT) + 1;
+        var rows = Math.ceil(s / UNIT) + 1;
+
+        for (var row = 0; row < rows; row++) {
+          for (var col = 0; col < cols; col++) {
+            var x = col * UNIT + 1, y = row * UNIT + 1;
+            var w = TILE, h = TILE;
+            var base = PAL[Math.floor(rng() * PAL.length)];
+
+            /* Tile base */
+            g.fillStyle = base;
+            g.fillRect(x, y, w, h);
+
+            /* Gloss: radial from top-left */
+            var gl = g.createRadialGradient(x+w*.22, y+h*.2, 0, x+w*.55, y+h*.55, w*.82);
+            gl.addColorStop(0,    'rgba(255,255,255,.58)');
+            gl.addColorStop(.42,  'rgba(255,255,255,.12)');
+            gl.addColorStop(1,    'rgba(0,0,0,.12)');
+            g.fillStyle = gl;
+            g.fillRect(x, y, w, h);
+
+            /* Inner edge shadow (bottom-right) */
+            g.fillStyle = 'rgba(0,0,0,.10)';
+            g.fillRect(x + w - 2, y, 2, h);
+            g.fillRect(x, y + h - 2, w, 2);
+          }
+        }
+      }
+
+      /* ── 3. Pebble Mosaic ─────────────────────── */
+      function drawPebble(g, s) {
+        var rng  = makeRng(11);
+        var GROUT = '#cac3ba';
+        var PAL   = ['#b2aba0','#c5bdb2','#a09890','#d2cbc0','#bcb5aa',
+                     '#a8a098','#ccc5ba','#b8b0a5','#d0c8bc','#9c9488'];
+
+        g.fillStyle = GROUT;
+        g.fillRect(0, 0, s, s);
+
+        var CELL = Math.round(s / 20); /* ~26px at 512 */
+        var cols = Math.ceil(s / CELL) + 2;
+        var rows = Math.ceil(s / CELL) + 2;
+
+        for (var row = -1; row < rows; row++) {
+          for (var col = -1; col < cols; col++) {
+            var cx = (col + rng()*.68 + .16) * CELL;
+            var cy = (row + rng()*.68 + .16) * CELL;
+            var rx = CELL * (.30 + rng()*.18);
+            var ry = CELL * (.22 + rng()*.14);
+            var angle = rng() * Math.PI;
+            var color = PAL[Math.floor(rng() * PAL.length)];
+
+            /* Draw at (0,0) and all 8 wrap offsets for seamless edges */
+            for (var dx = -1; dx <= 1; dx++) {
+              for (var dy = -1; dy <= 1; dy++) {
+                var px = cx + dx * s, py = cy + dy * s;
+                if (px+rx < -2 || px-rx > s+2 || py+ry < -2 || py-ry > s+2) continue;
+
+                g.save();
+                g.translate(px, py);
+                g.rotate(angle);
+
+                /* Shadow */
+                g.beginPath();
+                g.ellipse(rx*.07, ry*.13, rx*.88, ry*.88, 0, 0, Math.PI*2);
+                g.fillStyle = 'rgba(0,0,0,.18)';
+                g.fill();
+
+                /* Body */
+                g.beginPath();
+                g.ellipse(0, 0, rx, ry, 0, 0, Math.PI*2);
+                g.fillStyle = color;
+                g.fill();
+
+                /* Highlight */
+                g.beginPath();
+                g.ellipse(-rx*.24, -ry*.28, rx*.36, ry*.26, -.35, 0, Math.PI*2);
+                g.fillStyle = 'rgba(255,255,255,.30)';
+                g.fill();
+
+                g.restore();
+              }
+            }
+          }
+        }
+      }
+
+      /* ── 4. Cube Pattern (isometric 3-D) ─────── */
+      function drawCube(g, s) {
+        var a = Math.round(s / 17);     /* half-width of top rhombus */
+        var b = Math.round(a * .58);    /* half-height of top rhombus */
+        var d = Math.round(a * .95);    /* depth of side faces */
+
+        var TOP  = '#d4cec4';
+        var LEFT = '#6a625a';
+        var RIGHT= '#9e9890';
+        var LINE = '#1c1916';
+
+        g.fillStyle = LINE;
+        g.fillRect(0, 0, s, s);
+
+        var colW = a * 2;
+        var rowH = b + d;
+        var nR = Math.ceil(s / rowH) + 2;
+        var nC = Math.ceil(s / colW) + 2;
+
+        for (var row = -1; row < nR; row++) {
+          for (var col = -1; col < nC; col++) {
+            var mx = col * colW + (row & 1 ? a : 0) + a;
+            var my = row * rowH + b;
+
+            /* Top face */
+            g.beginPath();
+            g.moveTo(mx,     my-b);
+            g.lineTo(mx+a,   my);
+            g.lineTo(mx,     my+b);
+            g.lineTo(mx-a,   my);
+            g.closePath(); g.fillStyle = TOP; g.fill();
+
+            /* Left face */
+            g.beginPath();
+            g.moveTo(mx-a, my);
+            g.lineTo(mx,   my+b);
+            g.lineTo(mx,   my+b+d);
+            g.lineTo(mx-a, my+d);
+            g.closePath(); g.fillStyle = LEFT; g.fill();
+
+            /* Right face */
+            g.beginPath();
+            g.moveTo(mx,   my+b);
+            g.lineTo(mx+a, my);
+            g.lineTo(mx+a, my+d);
+            g.lineTo(mx,   my+b+d);
+            g.closePath(); g.fillStyle = RIGHT; g.fill();
+          }
+        }
+      }
+
+      /* ── 5. Wood-Look Porcelain ───────────────── */
+      function drawWood(g, s) {
+        var rng = makeRng(5);
+        var PH  = Math.round(s / 11);  /* plank height ~47px at 512 */
+        var SEAM = 2;
+        var PAL  = ['#b08060','#a87858','#c09070','#986850',
+                    '#b88a68','#a07860','#c49880','#906050'];
+        var rows = Math.ceil(s / PH) + 1;
+
+        for (var row = 0; row < rows; row++) {
+          var y = row * PH;
+          var h = PH - SEAM;
+          var base = PAL[Math.floor(rng() * PAL.length)];
+
+          /* Plank body gradient */
+          var gr = g.createLinearGradient(0, y, 0, y+h);
+          gr.addColorStop(0,   shiftHex(base,  9));
+          gr.addColorStop(.28, base);
+          gr.addColorStop(.72, base);
+          gr.addColorStop(1,   shiftHex(base, -12));
+          g.fillStyle = gr;
+          g.fillRect(0, y, s, h);
+
+          /* Grain: dark streaks */
+          g.save(); g.globalAlpha = .10; g.lineWidth = .9;
+          g.strokeStyle = shiftHex(base, -24);
+          var nDark = 3 + Math.floor(rng()*4);
+          for (var i = 0; i < nDark; i++) {
+            var gy = y + h*(0.08 + rng()*.84);
+            var w1 = (rng()-.5)*5, w2 = (rng()-.5)*4;
+            g.beginPath(); g.moveTo(0, gy);
+            g.bezierCurveTo(s*.28, gy+w1, s*.72, gy+w2, s, gy+(rng()-.5)*3);
+            g.stroke();
+          }
+          /* Grain: light streaks */
+          g.globalAlpha = .07;
+          g.strokeStyle = shiftHex(base, 18);
+          g.lineWidth = 1.4;
+          var nLight = 2 + Math.floor(rng()*3);
+          for (var j = 0; j < nLight; j++) {
+            var gy2 = y + h*(0.1 + rng()*.8);
+            g.beginPath(); g.moveTo(0, gy2);
+            g.bezierCurveTo(s*.32, gy2+(rng()-.5)*3, s*.68, gy2+(rng()-.5)*3, s, gy2+(rng()-.5)*2);
+            g.stroke();
+          }
+          g.restore();
+
+          /* Seam */
+          g.fillStyle = '#5c4838';
+          g.fillRect(0, y+h, s, SEAM);
+        }
+      }
+
+      /* ── 6. Subway Tile ───────────────────────── */
+      function drawSubway(g, s) {
+        var TW = Math.round(s / 8);   /* tile width  ~64px at 512 */
+        var TH = Math.round(TW / 2);  /* tile height ~32px */
+        var GW = 2;                    /* grout width */
+        var UW = TW + GW, UH = TH + GW;
+        var rows = Math.ceil(s / UH) + 2;
+        var cols = Math.ceil(s / UW) + 2;
+
+        /* Grout */
+        g.fillStyle = '#c8c4c0';
+        g.fillRect(0, 0, s, s);
+
+        for (var row = 0; row < rows; row++) {
+          var offset = (row & 1) ? UW / 2 : 0;
+          for (var col = -1; col < cols; col++) {
+            var x = col * UW + offset;
+            var y = row * UH;
+
+            /* Tile face */
+            var bk = g.createLinearGradient(x, y+1, x, y+TH+1);
+            bk.addColorStop(0,    '#fdfcfa');
+            bk.addColorStop(.12,  '#ffffff');
+            bk.addColorStop(.88,  '#f4f1ee');
+            bk.addColorStop(1,    '#e8e4e0');
+            g.fillStyle = bk;
+            g.fillRect(x+1, y+1, TW, TH);
+
+            /* Top edge highlight */
+            g.fillStyle = 'rgba(255,255,255,.55)';
+            g.fillRect(x+1, y+1, TW, 2);
+
+            /* Right + bottom edge shadow */
+            g.fillStyle = 'rgba(0,0,0,.07)';
+            g.fillRect(x+TW-1, y+1, 2, TH);
+            g.fillRect(x+1, y+TH-1, TW, 2);
+          }
+        }
+      }
+
+      /* ── Pre-generate all 6 patterns (512×512) ── */
+      var PAT_SIZE = 512;
+      var patternCanvases = {};
+      TILE_STYLES.forEach(function (style) {
+        patternCanvases[style.key] = generateTilePattern(style.key, PAT_SIZE);
+      });
+
       /* ── DOM refs ─────────────────────────────── */
-      var vizLayout    = document.getElementById('viz-layout');
-      var dropzone     = document.getElementById('viz-dropzone');
-      var fileInput    = document.getElementById('viz-file-input');
-      var canvas       = document.getElementById('viz-canvas');
-      var ctx          = canvas.getContext('2d');
-      var instruction  = document.getElementById('viz-instruction');
-      var controls     = document.getElementById('viz-controls');
-      var swatchesCol  = document.getElementById('viz-swatches-col');
-      var activeLabel  = document.getElementById('viz-active-label');
-      var resetBtn     = document.getElementById('viz-reset');
-      var downloadBtn  = document.getElementById('viz-download');
+      var vizLayout   = document.getElementById('viz-layout');
+      var dropzone    = document.getElementById('viz-dropzone');
+      var fileInput   = document.getElementById('viz-file-input');
+      var canvas      = document.getElementById('viz-canvas');
+      var ctx         = canvas.getContext('2d');
+      var swatchesCol = document.getElementById('viz-swatches-col');
+      var activeLabel = document.getElementById('viz-active-label');
+      var resetBtn    = document.getElementById('viz-reset');
+      var downloadBtn = document.getElementById('viz-download');
 
       /* ── State ────────────────────────────────── */
       var roomImg      = null;
-      var tileImgCache = {};   // src → Image
-      var activeTile   = null; // { src, name }
-      var corners      = [];   // [{x,y}] order: TL, TR, BR, BL
+      var activeTile   = null;
+      var corners      = [];
       var activeHandle = -1;
       var rafPending   = false;
 
-      /* Offscreen canvas for tile warp composite */
-      var offCanvas    = document.createElement('canvas');
-      var offCtx       = offCanvas.getContext('2d');
+      var offCanvas = document.createElement('canvas');
+      var offCtx    = offCanvas.getContext('2d');
 
-      /* ── Build swatches ───────────────────────── */
+      /* ── Build swatches from pattern canvases ─── */
       TILE_STYLES.forEach(function (style) {
         var btn = document.createElement('button');
         btn.className = 'viz-swatch';
         btn.setAttribute('type', 'button');
         btn.setAttribute('aria-label', style.name);
-        btn.dataset.src = style.src;
+        btn.dataset.key = style.key;
 
-        var img = document.createElement('img');
-        img.src = style.src;
-        img.alt = style.name;
-        img.loading = 'lazy';
+        /* Thumbnail: scale the 512×512 pattern down to 96×96 */
+        var thumb = document.createElement('canvas');
+        thumb.width = 96; thumb.height = 96;
+        thumb.style.cssText = 'width:100%;height:100%;display:block;';
+        thumb.getContext('2d').drawImage(patternCanvases[style.key], 0, 0, 96, 96);
 
         var lbl = document.createElement('span');
         lbl.className = 'viz-swatch-name';
         lbl.textContent = style.name;
 
-        btn.appendChild(img);
+        btn.appendChild(thumb);
         btn.appendChild(lbl);
         swatchesCol.appendChild(btn);
 
-        /* Pre-load tile image for canvas use */
-        var ti = new Image();
-        ti.crossOrigin = 'anonymous';
-        ti.src = style.src;
-        tileImgCache[style.src] = ti;
-
-        btn.addEventListener('click', function () {
-          setActiveTile(style, btn);
-        });
+        btn.addEventListener('click', function () { setActiveTile(style, btn); });
       });
 
       function setActiveTile(style, btn) {
@@ -1792,23 +2138,14 @@
         if (!roomImg) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(roomImg, 0, 0, canvas.width, canvas.height);
-
-        if (activeTile) {
-          var ti = tileImgCache[activeTile.src];
-          if (ti && ti.complete && ti.naturalWidth > 0) {
-            warpTile(ti);
-          } else if (ti) {
-            ti.onload = scheduleRender;
-          }
-        }
-
+        if (activeTile) warpTile(patternCanvases[activeTile.key]);
         drawHandles();
       }
 
       /* ── Perspective warp (affine triangle split) ── */
-      function warpTile(tileImg) {
+      function warpTile(src) {
         var TL = corners[0], TR = corners[1], BR = corners[2], BL = corners[3];
-        var SW = tileImg.naturalWidth, SH = tileImg.naturalHeight;
+        var SW = src.width, SH = src.height;
 
         offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
 
@@ -1816,11 +2153,11 @@
          * Triangle 1: source (0,0),(SW,0),(0,SH) → dest TL, TR, BL
          * Triangle 2: source (SW,SH),(SW,0),(0,SH) → dest BR, TR, BL
          */
-        drawWarpTri(offCtx, tileImg, SW, SH,
+        drawWarpTri(offCtx, src, SW, SH,
           0,  0,  SW, 0,  0,  SH,
           TL.x, TL.y,  TR.x, TR.y,  BL.x, BL.y);
 
-        drawWarpTri(offCtx, tileImg, SW, SH,
+        drawWarpTri(offCtx, src, SW, SH,
           SW, SH,  SW, 0,  0, SH,
           BR.x, BR.y,  TR.x, TR.y,  BL.x, BL.y);
 
@@ -2002,33 +2339,27 @@
       });
 
       downloadBtn.addEventListener('click', function () {
-        /* Render a clean composite (no handles) to a temp canvas */
-        var tmp  = document.createElement('canvas');
-        tmp.width  = canvas.width;
-        tmp.height = canvas.height;
+        /* Render a clean composite (no handles) to a temporary canvas */
+        var tmp = document.createElement('canvas');
+        tmp.width = canvas.width; tmp.height = canvas.height;
         var tc = tmp.getContext('2d');
         tc.drawImage(roomImg, 0, 0, canvas.width, canvas.height);
         if (activeTile) {
-          var ti = tileImgCache[activeTile.src];
-          if (ti && ti.complete && ti.naturalWidth > 0) {
-            var TL = corners[0], TR = corners[1], BR = corners[2], BL = corners[3];
-            var SW = ti.naturalWidth, SH = ti.naturalHeight;
-            var tmpOff = document.createElement('canvas');
-            tmpOff.width  = canvas.width;
-            tmpOff.height = canvas.height;
-            var toc = tmpOff.getContext('2d');
-            drawWarpTri(toc, ti, SW, SH,
-              0,  0,  SW, 0,  0,  SH,
-              TL.x, TL.y,  TR.x, TR.y,  BL.x, BL.y);
-            drawWarpTri(toc, ti, SW, SH,
-              SW, SH,  SW, 0,  0, SH,
-              BR.x, BR.y,  TR.x, TR.y,  BL.x, BL.y);
-            tc.save();
-            tc.globalCompositeOperation = 'multiply';
-            tc.globalAlpha = 0.9;
-            tc.drawImage(tmpOff, 0, 0);
-            tc.restore();
-          }
+          var src = patternCanvases[activeTile.key];
+          var TL = corners[0], TR = corners[1], BR = corners[2], BL = corners[3];
+          var SW = src.width, SH = src.height;
+          var to = document.createElement('canvas');
+          to.width = canvas.width; to.height = canvas.height;
+          var toc = to.getContext('2d');
+          drawWarpTri(toc, src, SW, SH, 0,0, SW,0, 0,SH,
+            TL.x,TL.y, TR.x,TR.y, BL.x,BL.y);
+          drawWarpTri(toc, src, SW, SH, SW,SH, SW,0, 0,SH,
+            BR.x,BR.y, TR.x,TR.y, BL.x,BL.y);
+          tc.save();
+          tc.globalCompositeOperation = 'multiply';
+          tc.globalAlpha = 0.9;
+          tc.drawImage(to, 0, 0);
+          tc.restore();
         }
         var link = document.createElement('a');
         link.download = 'tile-visualization.png';
