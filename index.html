@@ -183,7 +183,7 @@
     .hero-grid {
       flex: 1;
       display: grid;
-      grid-template-columns: 1fr 30% 1fr;
+      grid-template-columns: 1fr 70% 1fr;
       min-height: 520px;
       overflow: hidden;
     }
@@ -194,15 +194,7 @@
       grid-template-rows: repeat(5, 1fr);
       gap: 4px;
       padding: 4px;
-      /* Initial state — curtain animation */
-      opacity: 0.85;
-      transition: transform 0.9s ease-out, opacity 0.9s ease-out;
-      will-change: transform, opacity;
     }
-
-    /* Revealed states (JS adds .hero-revealed) */
-    #tile-col-left.hero-revealed  { transform: translateX(-120px); opacity: 1; }
-    #tile-col-right.hero-revealed { transform: translateX(120px);  opacity: 1; }
 
     .tile-cell {
       position: relative;
@@ -232,17 +224,6 @@
       100% { filter: brightness(1); }
     }
 
-    /* Reduced-motion: skip curtain animation, show final state instantly */
-    @media (prefers-reduced-motion: reduce) {
-      .tile-col         { transition: none; opacity: 1; }
-      #tile-col-left    { transform: none; }
-      #tile-col-right   { transform: none; }
-      #tile-col-left.hero-revealed  { transform: none; }
-      #tile-col-right.hero-revealed { transform: none; }
-      .hero-center      { transition: none; transform: scale(1); opacity: 1; }
-      .hero-center.hero-revealed { transform: scale(1); }
-    }
-
     /* Tooltip */
     .tile-tooltip {
       position: fixed;
@@ -267,16 +248,6 @@
       position: relative;
       overflow: hidden;
       cursor: pointer;
-      /* Initial state — curtain animation */
-      transform: scale(0.92);
-      opacity: 0.9;
-      transition: transform 0.9s ease-out, opacity 0.9s ease-out;
-      will-change: transform, opacity;
-    }
-
-    .hero-center.hero-revealed {
-      transform: scale(1);
-      opacity: 1;
     }
 
     .hero-center img {
@@ -1603,39 +1574,6 @@
 
       buildTileGrid(document.getElementById('tile-col-left'),  10);
       buildTileGrid(document.getElementById('tile-col-right'), 10);
-
-      // ── Hero curtain-open + center-zoom scroll animation ────────
-      var heroGrid     = document.querySelector('.hero-grid');
-      var tileColLeft  = document.getElementById('tile-col-left');
-      var tileColRight = document.getElementById('tile-col-right');
-      var heroCenter   = document.querySelector('.hero-center');
-
-      function revealHero() {
-        tileColLeft.classList.add('hero-revealed');
-        tileColRight.classList.add('hero-revealed');
-        heroCenter.classList.add('hero-revealed');
-      }
-
-      var prefersReduced = window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      if (prefersReduced) {
-        // Skip animation — snap to final state immediately
-        revealHero();
-      } else if ('IntersectionObserver' in window) {
-        var heroObserver = new IntersectionObserver(function(entries) {
-          entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-              revealHero();
-              heroObserver.unobserve(entry.target); // fire once only
-            }
-          });
-        }, { threshold: 0.35 });
-        heroObserver.observe(heroGrid);
-      } else {
-        // Fallback: no IntersectionObserver support — show final state
-        revealHero();
-      }
 
       // ── Gallery masonry ─────────────────────────────────────────
       var masonry = document.getElementById('gallery-masonry');
