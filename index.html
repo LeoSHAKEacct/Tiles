@@ -65,24 +65,15 @@
     }
 
     .nav-logomark {
-      width: 36px;
-      height: 36px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 3px;
+      display: flex;
+      align-items: center;
     }
 
-    .nav-logomark span {
-      background: var(--travertine);
-      border-radius: 2px;
-      transition: background 0.3s;
+    .nav-logomark img {
+      max-height: 48px;
+      width: auto;
+      display: block;
     }
-    .nav-logomark span:nth-child(2) { background: var(--copper); }
-    .nav-logomark span:nth-child(3) { background: var(--copper); opacity: 0.6; }
-    .nav-logomark span:nth-child(4) { background: var(--travertine); opacity: 0.7; }
-
-    .nav-logo:hover .nav-logomark span { background: var(--copper); opacity: 1; }
 
     .nav-wordmark {
       font-family: var(--font-serif);
@@ -1108,8 +1099,8 @@
   <!-- ── Nav ── -->
   <nav aria-label="Main navigation">
     <a href="#hero" class="nav-logo" aria-label="Dynamic Tile &amp; Stone home">
-      <div class="nav-logomark" aria-hidden="true">
-        <span></span><span></span><span></span><span></span>
+      <div class="nav-logomark">
+        <img src="images/dynamic-tile-stone-logo.jpeg" alt="Dynamic Tile &amp; Stone logo">
       </div>
       <div class="nav-wordmark">
         Dynamic Tile &amp; Stone
