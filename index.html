@@ -2497,6 +2497,10 @@
         scheduleRender();
       }
 
+      /* ── Prevent browser navigating away when file is dropped outside dropzone */
+      document.addEventListener('dragover', function (e) { e.preventDefault(); });
+      document.addEventListener('drop',     function (e) { e.preventDefault(); });
+
       /* ── Dropzone interaction ─────────────────── */
       dropzone.addEventListener('click', function () { fileInput.click(); });
       dropzone.addEventListener('keydown', function (e) {
@@ -2524,7 +2528,8 @@
         dropzone.classList.remove('drag-over');
         var dt = e.dataTransfer;
         var file = dt && dt.files && dt.files[0];
-        if (file && file.type.startsWith('image/')) {
+        /* Accept by MIME type OR by extension — some browsers report empty type for dragged files */
+        if (file && (file.type.startsWith('image/') || /\.(jpe?g|png|gif|webp|avif|bmp)$/i.test(file.name))) {
           loadFile(file);
         }
       });
